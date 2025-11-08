@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Система класного керівника</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #ddd;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border: 2px solid #888;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 8px;
+        }
+        .tabs button {
+            padding: 12px 20px;
+            background-color: #ccc;
+            border: 2px solid #999;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .tabs button.active {
+            background-color: white;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            margin-top: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 2px solid #999;
+            font-size: 14px;
+        }
+        button[type="submit"] {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background-color: #4a9;
+            color: white;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button[type="submit"]:hover {
+            background-color: #387;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border: 2px solid #999;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        th {
+            background-color: #ddd;
+            font-weight: bold;
+        }
+        .delete-btn {
+            padding: 6px 12px;
+            background-color: #d44;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .stats-box {
+            background-color: #4a9;
+            color: white;
+            padding: 25px;
+            margin: 10px;
+            display: inline-block;
+            width: 28%;
+            text-align: center;
+            border: 3px solid #387;
+        }
+        .stats-box h3 {
+            font-size: 40px;
+            margin: 10px 0;
+        }
+        .message {
+            padding: 12px;
+            background-color: #cfc;
+            border: 2px solid #9c9;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Система класного керівника</h1>
+        
+        <div class="message" id="msg"></div>
+
+        <div class="tabs">
+            <button class="active" onclick="switchTab(0)">Учні</button>
+            <button onclick="switchTab(1)">Оцінки</button>
+            <button onclick="switchTab(2)">Відвідуваність</button>
+            <button onclick="switchTab(3)">Батьки</button>
+            <button onclick="switchTab(4)">Статистика</button>
+        </div>
+
+        <!-- Вкладка 0: Учні -->
+        <div class="tab-content active">
+            <h2>Додати учня</h2>
+            <form onsubmit="addStudent(); return false;">
+                <label>Прізвище:</label>
+                <input type="text" id="surname" required>
+                
+                <label>Ім'я:</label>
+                <input type="text" id="name" required>
+                
+                <label>По батькові:</label>
+                <input type="text" id="patronymic" required>
+                
+                <label>Дата народження:</label>
+                <input type="date" id="birthdate" required>
+                
+                <label>Телефон:</label>
+                <input type="tel" id="tel">
+                
+                <button type="submit">Додати учня</button>
+            </form>
+
+            <h2>Список учнів</h2>
+            <table id="studentTable"></table>
+        </div>
+
+        <!-- Вкладка 1: Оцінки -->
+        <div class="tab-content">
+            <h2>Додати оцінку</h2>
+            <form onsubmit="addGrade(); return false;">
+                <label>Учень:</label>
+                <select id="gradeStudent" required></select>
+                
+                <label>Предмет:</label>
+                <input type="text" id="subjectName" required>
+                
+                <label>Оцінка (1-12):</label>
+                <select id="gradeValue" required>
+                    <option value="">Оберіть</option>
+                    <option>12</option><option>11</option><option>10</option>
+                    <option>9</option><option>8</option><option>7</option>
+                    <option>6</option><option>5</option><option>4</option>
+                    <option>3</option><option>2</option><option>1</option>
+                </select>
+                
+                <label>Дата:</label>
+                <input type="date" id="gradeDate" required>
+                
+                <button type="submit">Додати оцінку</button>
+            </form>
+
+            <h2>Журнал оцінок</h2>
+            <table id="gradeTable"></table>
+        </div>
+
+        <!-- Вкладка 2: Відвідуваність -->
+        <div class="tab-content">
+            <h2>Відмітити відвідуваність</h2>
+            <form onsubmit="addAttendance(); return false;">
+                <label>Учень:</label>
+                <select id="attStudent" required></select>
+                
+                <label>Дата:</label>
+                <input type="date" id="attDate" required>
+                
+                <label>Статус:</label>
+                <select id="attStatus" required>
+                    <option value="">Оберіть</option>
+                    <option>Присутній</option>
+                    <option>Відсутній</option>
+                    <option>Хворіє</option>
+                    <option>Запізнився</option>
+                </select>
+                
+                <button type="submit">Зберегти</button>
+            </form>
+
+            <h2>Журнал відвідуваності</h2>
+            <table id="attTable"></table>
+        </div>
+
+        <!-- Вкладка 3: Батьки -->
+        <div class="tab-content">
+            <h2>Контакти батьків</h2>
+            <form onsubmit="addParent(); return false;">
+                <label>Учень:</label>
+                <select id="parentStudent" required></select>
+                
+                <label>ПІБ батька/матері:</label>
+                <input type="text" id="parentName" required>
+                
+                <label>Телефон:</label>
+                <input type="tel" id="parentTel" required>
+                
+                <label>Email:</label>
+                <input type="email" id="parentEmail">
+                
+                <button type="submit">Додати контакт</button>
+            </form>
+
+            <h2>Список контактів</h2>
+            <table id="parentTable"></table>
+        </div>
+
+        <!-- Вкладка 4: Статистика -->
+        <div class="tab-content">
+            <h2>Загальна статистика класу</h2>
+            <div style="text-align: center;">
+                <div class="stats-box">
+                    <h3 id="totalStudents">0</h3>
+                    <p>Всього учнів</p>
+                </div>
+                <div class="stats-box">
+                    <h3 id="avgGrade">0</h3>
+                    <p>Середній бал</p>
+                </div>
+                <div class="stats-box">
+                    <h3 id="attPercent">0%</h3>
+                    <p>Відвідуваність</p>
+                </div>
+            </div>
+
+            <h2>Успішність учнів</h2>
+            <table id="statsTable"></table>
+        </div>
+    </div>
+
+    <script>
+        // Масиви для зберігання даних
+        var students = [];
+        var grades = [];
+        var attendance = [];
+        var parents = [];
+
+        // Завантаження даних з localStorage
+        function loadData() {
+            var temp;
+            temp = localStorage.getItem('students');
+            if (temp) students = JSON.parse(temp);
+            temp = localStorage.getItem('grades');
+            if (temp) grades = JSON.parse(temp);
+            temp = localStorage.getItem('attendance');
+            if (temp) attendance = JSON.parse(temp);
+            temp = localStorage.getItem('parents');
+            if (temp) parents = JSON.parse(temp);
+        }
+
+        // Показати повідомлення
+        function showMsg(text) {
+            var m = document.getElementById('msg');
+            m.innerHTML = text;
+            m.style.display = 'block';
+            setTimeout(function() { m.style.display = 'none'; }, 2000);
+        }
+
+        // Перемикання вкладок
+        function switchTab(num) {
+            var tabs = document.querySelectorAll('.tab-content');
+            var btns = document.querySelectorAll('.tabs button');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].className = 'tab-content';
+                btns[i].className = '';
+            }
+            tabs[num].className = 'tab-content active';
+            btns[num].className = 'active';
+            if (num == 4) calcStats();
+        }
+
+        // Додати учня
+        function addStudent() {
+            var s = {
+                id: Date.now(),
+                surname: document.getElementById('surname').value,
+                name: document.getElementById('name').value,
+                patronymic: document.getElementById('patronymic').value,
+                birthdate: document.getElementById('birthdate').value,
+                tel: document.getElementById('tel').value
+            };
+            students.push(s);
+            localStorage.setItem('students', JSON.stringify(students));
+            showMsg('Учня додано');
+            document.getElementById('surname').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('patronymic').value = '';
+            document.getElementById('birthdate').value = '';
+            document.getElementById('tel').value = '';
+            showStudents();
+            fillSelects();
+        }
+
+        // Показати список учнів
+        function showStudents() {
+            var html = '<tr><th>№</th><th>ПІБ</th><th>Дата народження</th><th>Телефон</th><th></th></tr>';
+            for (var i = 0; i < students.length; i++) {
+                var s = students[i];
+                html += '<tr>';
+                html += '<td>' + (i+1) + '</td>';
+                html += '<td>' + s.surname + ' ' + s.name + ' ' + s.patronymic + '</td>';
+                html += '<td>' + s.birthdate + '</td>';
+                html += '<td>' + s.tel + '</td>';
+                html += '<td><button class="delete-btn" onclick="delStudent(' + s.id + ')">Видалити</button></td>';
+                html += '</tr>';
+            }
+            document.getElementById('studentTable').innerHTML = html;
+        }
+
+        // Видалити учня
+        function delStudent(id) {
+            if (confirm('Видалити учня?')) {
+                var newArr = [];
+                for (var i = 0; i < students.length; i++) {
+                    if (students[i].id != id) newArr.push(students[i]);
+                }
+                students = newArr;
+                localStorage.setItem('students', JSON.stringify(students));
+                showStudents();
+                fillSelects();
+                showMsg('Видалено');
+            }
+        }
+
+        // Заповнити випадаючі списки учнів
+        function fillSelects() {
+            var ids = ['gradeStudent', 'attStudent', 'parentStudent'];
+            for (var s = 0; s < ids.length; s++) {
+                var sel = document.getElementById(ids[s]);
+                sel.innerHTML = '<option value="">Оберіть учня</option>';
+                for (var i = 0; i < students.length; i++) {
+                    var opt = document.createElement('option');
+                    opt.value = students[i].id;
+                    opt.text = students[i].surname + ' ' + students[i].name;
+                    sel.add(opt);
+                }
+            }
+        }
+
+        // Додати оцінку
+        function addGrade() {
+            var g = {
+                id: Date.now(),
+                studentId: parseInt(document.getElementById('gradeStudent').value),
+                subject: document.getElementById('subjectName').value,
+                value: document.getElementById('gradeValue').value,
+                date: document.getElementById('gradeDate').value
+            };
+            grades.push(g);
+            localStorage.setItem('grades', JSON.stringify(grades));
+            showMsg('Оцінку додано');
+            document.getElementById('gradeStudent').value = '';
+            document.getElementById('subjectName').value = '';
+            document.getElementById('gradeValue').value = '';
+            document.getElementById('gradeDate').value = '';
+            showGrades();
+        }
+
+        // Показати оцінки
+        function showGrades() {
+            var html = '<tr><th>Учень</th><th>Предмет</th><th>Оцінка</th><th>Дата</th><th></th></tr>';
+            for (var i = 0; i < grades.length; i++) {
+                var g = grades[i];
+                var student = getStudent(g.studentId);
+                if (student) {
+                    html += '<tr>';
+                    html += '<td>' + student.surname + ' ' + student.name + '</td>';
+                    html += '<td>' + g.subject + '</td>';
+                    html += '<td>' + g.value + '</td>';
+                    html += '<td>' + g.date + '</td>';
+                    html += '<td><button class="delete-btn" onclick="delGrade(' + g.id + ')">Видалити</button></td>';
+                    html += '</tr>';
+                }
+            }
+            document.getElementById('gradeTable').innerHTML = html;
+        }
+
+        // Видалити оцінку
+        function delGrade(id) {
+            var newArr = [];
+            for (var i = 0; i < grades.length; i++) {
+                if (grades[i].id != id) newArr.push(grades[i]);
+            }
+            grades = newArr;
+            localStorage.setItem('grades', JSON.stringify(grades));
+            showGrades();
+            showMsg('Видалено');
+        }
+
+        // Додати відвідуваність
+        function addAttendance() {
+            var a = {
+                id: Date.now(),
+                studentId: parseInt(document.getElementById('attStudent').value),
+                date: document.getElementById('attDate').value,
+                status: document.getElementById('attStatus').value
+            };
+            attendance.push(a);
+            localStorage.setItem('attendance', JSON.stringify(attendance));
+            showMsg('Збережено');
+            document.getElementById('attStudent').value = '';
+            document.getElementById('attDate').value = '';
+            document.getElementById('attStatus').value = '';
+            showAttendance();
+        }
+
+        // Показати відвідуваність
+        function showAttendance() {
+            var html = '<tr><th>Учень</th><th>Дата</th><th>Статус</th><th></th></tr>';
+            for (var i = 0; i < attendance.length; i++) {
+                var a = attendance[i];
+                var student = getStudent(a.studentId);
+                if (student) {
+                    html += '<tr>';
+                    html += '<td>' + student.surname + ' ' + student.name + '</td>';
+                    html += '<td>' + a.date + '</td>';
+                    html += '<td>' + a.status + '</td>';
+                    html += '<td><button class="delete-btn" onclick="delAttendance(' + a.id + ')">Видалити</button></td>';
+                    html += '</tr>';
+                }
+            }
+            document.getElementById('attTable').innerHTML = html;
+        }
+
+        // Видалити відвідуваність
+        function delAttendance(id) {
+            var newArr = [];
+            for (var i = 0; i < attendance.length; i++) {
+                if (attendance[i].id != id) newArr.push(attendance[i]);
+            }
+            attendance = newArr;
+            localStorage.setItem('attendance', JSON.stringify(attendance));
+            showAttendance();
+            showMsg('Видалено');
+        }
+
+        // Додати батьків
+        function addParent() {
+            var p = {
+                id: Date.now(),
+                studentId: parseInt(document.getElementById('parentStudent').value),
+                name: document.getElementById('parentName').value,
+                tel: document.getElementById('parentTel').value,
+                email: document.getElementById('parentEmail').value
+            };
+            parents.push(p);
+            localStorage.setItem('parents', JSON.stringify(parents));
+            showMsg('Контакт додано');
+            document.getElementById('parentStudent').value = '';
+            document.getElementById('parentName').value = '';
+            document.getElementById('parentTel').value = '';
+            document.getElementById('parentEmail').value = '';
+            showParents();
+        }
+
+        // Показати батьків
+        function showParents() {
+            var html = '<tr><th>Учень</th><th>ПІБ батька/матері</th><th>Телефон</th><th>Email</th><th></th></tr>';
+            for (var i = 0; i < parents.length; i++) {
+                var p = parents[i];
+                var student = getStudent(p.studentId);
+                if (student) {
+                    html += '<tr>';
+                    html += '<td>' + student.surname + ' ' + student.name + '</td>';
+                    html += '<td>' + p.name + '</td>';
+                    html += '<td>' + p.tel + '</td>';
+                    html += '<td>' + p.email + '</td>';
+                    html += '<td><button class="delete-btn" onclick="delParent(' + p.id + ')">Видалити</button></td>';
+                    html += '</tr>';
+                }
+            }
+            document.getElementById('parentTable').innerHTML = html;
+        }
+
+        // Видалити батьків
+        function delParent(id) {
+            var newArr = [];
+            for (var i = 0; i < parents.length; i++) {
+                if (parents[i].id != id) newArr.push(parents[i]);
+            }
+            parents = newArr;
+            localStorage.setItem('parents', JSON.stringify(parents));
+            showParents();
+            showMsg('Видалено');
+        }
+
+        // Знайти учня по ID
+        function getStudent(id) {
+            for (var i = 0; i < students.length; i++) {
+                if (students[i].id == id) return students[i];
+            }
+            return null;
+        }
+
+        // Розрахувати статистику
+        function calcStats() {
+            document.getElementById('totalStudents').innerHTML = students.length;
+            
+            if (grades.length > 0) {
+                var sum = 0;
+                for (var i = 0; i < grades.length; i++) {
+                    sum = sum + parseInt(grades[i].value);
+                }
+                var avg = sum / grades.length;
+                document.getElementById('avgGrade').innerHTML = avg.toFixed(1);
+            } else {
+                document.getElementById('avgGrade').innerHTML = '0';
+            }
+            
+            if (attendance.length > 0) {
+                var present = 0;
+                for (var i = 0; i < attendance.length; i++) {
+                    if (attendance[i].status == 'Присутній') present++;
+                }
+                var percent = (present / attendance.length) * 100;
+                document.getElementById('attPercent').innerHTML = percent.toFixed(0) + '%';
+            } else {
+                document.getElementById('attPercent').innerHTML = '0%';
+            }
+            
+            var html = '<tr><th>Учень</th><th>Оцінок</th><th>Середній бал</th><th>Відвідуваність</th></tr>';
+            for (var i = 0; i < students.length; i++) {
+                var student = students[i];
+                var sGrades = [];
+                var sAtt = [];
+                
+                for (var j = 0; j < grades.length; j++) {
+                    if (grades[j].studentId == student.id) sGrades.push(grades[j]);
+                }
+                for (var j = 0; j < attendance.length; j++) {
+                    if (attendance[j].studentId == student.id) sAtt.push(attendance[j]);
+                }
+                
+                var avgG = 0;
+                if (sGrades.length > 0) {
+                    var sum = 0;
+                    for (var k = 0; k < sGrades.length; k++) {
+                        sum = sum + parseInt(sGrades[k].value);
+                    }
+                    avgG = (sum / sGrades.length).toFixed(1);
+                }
+                
+                var attP = 0;
+                if (sAtt.length > 0) {
+                    var present = 0;
+                    for (var k = 0; k < sAtt.length; k++) {
+                        if (sAtt[k].status == 'Присутній') present++;
+                    }
+                    attP = ((present / sAtt.length) * 100).toFixed(0);
+                }
+                
+                html += '<tr>';
+                html += '<td>' + student.surname + ' ' + student.name + '</td>';
+                html += '<td>' + sGrades.length + '</td>';
+                html += '<td>' + avgG + '</td>';
+                html += '<td>' + attP + '%</td>';
+                html += '</tr>';
+            }
+            document.getElementById('statsTable').innerHTML = html;
+        }
+
+        // Запуск при завантаженні
+        window.onload = function() {
+            loadData();
+            showStudents();
+            fillSelects();
+            showGrades();
+            showAttendance();
+            showParents();
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('gradeDate').value = today;
+            document.getElementById('attDate').value = today;
+        };
+    </script>
+</body>
+</html>
